@@ -104,7 +104,19 @@ class Game
 
   def setup
     place_computer_ships
-    @player.place_ships
+    loop do
+      puts "Do you want to place your ships manually or randomly? (m/r)"
+      input = gets.chomp.downcase
+      if input == 'm'
+        @player.place_ships
+        break
+      elsif input == 'r'
+        randomize_player_ships
+        break
+      else
+        puts "Invalid choice, please type 'm' for manual or 'r' for random placements."
+      end
+    end
     take_turns
   end
 
@@ -121,22 +133,39 @@ class Game
     end
   end
 
+  def randomize_player_ships
+    @player.ships.each do |ship|
+      placed = false
+      until placed
+        coordinates = generate_random_coordinates(ship.length)
+        if @player.board.valid_placement?(ship, coordinates)
+          @player.board.place(ship, coordinates)
+          placed = true
+        end
+      end
+    end
+  end
+
   def generate_random_coordinates(length)
     letters = ("A"..(65 + @player.board.instance_variable_get(:@height) - 1).chr).to_a
     numbers = (1..@player.board.instance_variable_get(:@width)).to_a
-    start_letter = letters.sample
-    start_number = numbers.sample
     direction = ["horizontal", "vertical"].sample
-
+  
     coordinates = []
-    length.times do |i|
-      if direction == "horizontal"
-        coordinate = "#{start_letter}#{start_number + i}"
+    if direction == "horizontal"
+      start_letter = letters.sample
+      start_number = numbers.sample(length).sort
+      start_number.each do |num|
+        coordinate = "#{start_letter}#{num}"
         break unless valid_coordinate?(coordinate)
         coordinates << coordinate
-      else
-        coordinate = "#{(start_letter.ord + i).chr}#{start_number}"
-        break unless valid_coordinate?(coordinate)
+      end
+    else
+      start_letter = letters.sample(length).sort
+      start_number = numbers.sample
+      start_letter.each do |let|
+        coordinate = "#{let}#{start_number}"
+        break unless valid_coordinate?(coordinate) # similar to return unless, i enjoy using this for exception handling
         coordinates << coordinate
       end
     end

@@ -26,6 +26,41 @@ class Game
   end
 
   def setup_game
+    puts "Choose a preset or create a custom game:"
+    puts "1. Small game (4x4 board with two 2x1 ships)"
+    puts "2. Medium game (6x6 board with one 2x1 and two 3x1 ships)"
+    puts "3. Large game (8x8 board with one 4x1, two 3x1, and one 2x1 ships)"
+    puts "4. Custom game"
+    choice = gets.chomp.to_i
+
+    case choice
+    when 1
+      setup_preset(4, 4, [["Ship1", 2], ["Ship2", 2]])
+    when 2
+      setup_preset(6, 6, [["Ship1", 2], ["Ship2", 3], ["Ship3", 3]])
+    when 3
+      setup_preset(8, 8, [["Ship1", 4], ["Ship2", 3], ["Ship3", 3], ["Ship4", 2]])
+    when 4
+      setup_custom_game
+    else
+      puts "\e[31mInvalid choice. Please enter a number between 1 and 4.\e[0m"
+      setup_game
+    end
+  end
+
+  def setup_preset(height, width, ships)
+    @player = Player.new(height, width)
+    @computer = Player.new(height, width)
+
+    ships.each do |name, length|
+      @player.add_ship(name, length)
+      @computer.add_ship(name, length)
+    end
+
+    setup
+  end
+
+  def setup_custom_game
     puts "Enter the height of the board:"
     height = gets.chomp.to_i
     puts "Enter the width of the board:"
@@ -138,7 +173,7 @@ class Game
         @player.board.cells[coordinate].fire_upon
         valid_shot = true
         puts "My shot on \e[33m#{coordinate}\e[0m was a #{shot_result(@player.board, coordinate)}."
-        @last_hit = coordinate if @player.board.cells[coordinate].ship #makes the guessing algorithm smarter
+        @last_hit = coordinate if @player.board.cells[coordinate].ship
       end
     end
   end

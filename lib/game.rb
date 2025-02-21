@@ -243,19 +243,25 @@ class Game
       end
     else # hard difficulty
       if @last_hit
-        # Prioritize guessing in a straight line from the last hit
+        # prioritize guessing in a straight line from the last hit
         next_guess = adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? }
         if next_guess
           next_guess
         else
-          # If no valid adjacent coordinates, reset to random guessing
-          @last_hit = nil 
-          random_guess # sanity check
+          # if no valid adjacent coordinates, reset to random guessing
+          @last_hit = nil
+          random_guess
         end
-      else
-        random_guess
+      else # if no hits currently go back to a pattern based guess
+        # guess cells in a checkerboard pattern
+        pattern_guess
       end
     end
+  end
+  
+  def pattern_guess
+    cells = @player.board.cells.keys.select.with_index { |_, i| i.even? } # guesses in evens/odds
+    cells.find { |coord| !@player.board.cells[coord].fired_upon? } || random_guess # this allows it to check off the board like a checkerboard
   end
 
   def adjacent_coordinates(coordinate)

@@ -2,31 +2,31 @@ require './lib/board'
 require './lib/ship'
 
 class Player
-  def initialize
-    @board = Board.new
-    @cruiser = Ship.new("Cruiser", 3)
-    @submarine = Ship.new("Submarine", 2)
+  def initialize(height = 4, width = 4)
+    @board = Board.new(height, width)
+    @ships = []
   end
 
   def board
     @board
   end
 
-  def cruiser
-    @cruiser
+  def ships
+    @ships
   end
 
-  def submarine
-    @submarine
+  def add_ship(name, length)
+    @ships << Ship.new(name, length)
   end
 
   def place_ships
     puts "I have laid out my ships on the grid."
-    puts "You now need to lay out your two ships."
+    puts "You now need to lay out your ships."
     puts @board.render
 
-    place_ship(@cruiser)
-    place_ship(@submarine)
+    @ships.each do |ship|
+      place_ship(ship)
+    end
   end
 
   def place_ship(ship)

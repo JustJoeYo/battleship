@@ -2,10 +2,12 @@ require './lib/cell'
 require './lib/ship'
 
 class Board
-  def initialize
+  def initialize(height = 4, width = 4)
+    @height = height
+    @width = width
     @cells = {}
-    ("A".."D").each do |letter|
-      (1..4).each do |number|
+    ("A"..(65 + height - 1).chr).each do |letter|
+      (1..width).each do |number|
         coordinate = "#{letter}#{number}"
         @cells[coordinate] = Cell.new(coordinate)
       end
@@ -50,10 +52,10 @@ class Board
   end
 
   def render(show_ships = false)
-    board_string = "  1 2 3 4 \n"
-    ("A".."D").each do |letter|
+    board_string = "  " + (1..@width).to_a.join(" ") + " \n"
+    ("A"..(65 + @height - 1).chr).each do |letter|
       row = "#{letter} "
-      (1..4).each do |number|
+      (1..@width).each do |number|
         coordinate = "#{letter}#{number}"
         row += @cells[coordinate].render(show_ships) + " "
       end

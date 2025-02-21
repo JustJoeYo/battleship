@@ -2,8 +2,9 @@ require './lib/player'
 
 class Game
   def initialize
-    @player = Player.new
-    @computer = Player.new
+    @player = nil
+    @computer = nil
+    @last_hit = nil
   end
 
   def start
@@ -15,12 +16,51 @@ class Game
     puts "Enter \e[32mp\e[0m to play. Enter \e[31mq\e[0m to quit."
     input = gets.chomp.downcase
     if input == 'p'
-      setup
+      setup_game
     elsif input == 'q'
       puts "\e[31mGoodbye!\e[0m"
     else
       puts "\e[31mInvalid input. Please enter p or q.\e[0m"
       main_menu
+    end
+  end
+
+  def setup_game
+    puts "Enter the height of the board:"
+    height = gets.chomp.to_i
+    puts "Enter the width of the board:"
+    width = gets.chomp.to_i
+
+    @player = Player.new(height, width)
+    @computer = Player.new(height, width)
+
+    setup_ships
+    setup
+  end
+
+  def setup_ships
+    puts "Do you want to create custom ships? (y/n)"
+    input = gets.chomp.downcase
+    if input == 'y'
+      create_custom_ships
+    else
+      @player.add_ship("Cruiser", 3)
+      @player.add_ship("Submarine", 2)
+      @computer.add_ship("Cruiser", 3)
+      @computer.add_ship("Submarine", 2)
+    end
+  end
+
+  def create_custom_ships
+    loop do
+      puts "Enter the name of the ship:"
+      name = gets.chomp
+      puts "Enter the length of the ship:"
+      length = gets.chomp.to_i
+      @player.add_ship(name, length)
+      @computer.add_ship(name, length)
+      puts "Do you want to add another ship? (y/n)"
+      break if gets.chomp.downcase != 'y'
     end
   end
 
@@ -31,7 +71,7 @@ class Game
   end
 
   def place_computer_ships
-    [@computer.cruiser, @computer.submarine].each do |ship|
+    @computer.ships.each do |ship|
       placed = false
       until placed
         coordinates = generate_random_coordinates(ship.length)
@@ -44,8 +84,8 @@ class Game
   end
 
   def generate_random_coordinates(length)
-    letters = ("A".."D").to_a
-    numbers = (1..4).to_a
+    letters = ("A"..(65 + @player.board.instance_variable_get(:@height) - 1).chr).to_a
+    numbers = (1..@player.board.instance_variable_get(:@width)).to_a
     start_letter = letters.sample
     start_number = numbers.sample
     direction = ["horizontal", "vertical"].sample
@@ -66,8 +106,8 @@ class Game
   end
 
   def valid_coordinate?(coordinate)
-    letters = ("A".."D").to_a
-    numbers = (1..4).to_a
+    letters = ("A"..(65 + @player.board.instance_variable_get(:@height) - 1).chr).to_a
+    numbers = (1..@player.board.instance_variable_get(:@width)).to_a
     letter = coordinate[0]
     number = coordinate[1..-1].to_i
     letters.include?(letter) && numbers.include?(number)
@@ -93,13 +133,37 @@ class Game
   def computer_shot
     valid_shot = false
     until valid_shot
-      coordinate = @player.board.cells.keys.sample
+      coordinate = intelligent_guess
       if @player.board.valid_coordinate?(coordinate) && !@player.board.cells[coordinate].fired_upon?
         @player.board.cells[coordinate].fire_upon
         valid_shot = true
         puts "My shot on \e[33m#{coordinate}\e[0m was a #{shot_result(@player.board, coordinate)}."
+        @last_hit = coordinate if @player.board.cells[coordinate].ship #makes the guessing algorithm smarter
       end
     end
+  end
+
+  def intelligent_guess
+    if @last_hit
+      adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? } || random_guess
+    else
+      random_guess
+    end
+  end
+
+  def adjacent_coordinates(coordinate)
+    letter = coordinate[0]
+    number = coordinate[1..-1].to_i
+    adjacent = []
+    adjacent << "#{(letter.ord - 1).chr}#{number}" if valid_coordinate?("#{(letter.ord - 1).chr}#{number}")
+    adjacent << "#{(letter.ord + 1).chr}#{number}" if valid_coordinate?("#{(letter.ord + 1).chr}#{number}")
+    adjacent << "#{letter}#{number - 1}" if valid_coordinate?("#{letter}#{number - 1}")
+    adjacent << "#{letter}#{number + 1}" if valid_coordinate?("#{letter}#{number + 1}")
+    adjacent
+  end
+
+  def random_guess
+    @player.board.cells.keys.sample
   end
 
   def shot_result(board, coordinate)

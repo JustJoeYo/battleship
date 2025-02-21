@@ -1,7 +1,7 @@
 class Cell
   def initialize(coordinate)
     @coordinate = coordinate
-    @ship = nil # best way to initialize the value, will redefine later.
+    @ship = nil
     @fired_upon = false
   end
 
@@ -32,12 +32,12 @@ class Cell
     end
   end
 
-  def render(show_ship = false) # renders the board
-    if @fired_upon # logic for shot squares
-      return "X" if @ship && @ship.sunk? # sunk ship
-      return "H" if @ship # hit
-      return "M" # miss
-    else # logic for unshot squares
+  def render(show_ship = false)
+    if @fired_upon
+      return "\e[31mX\e[0m" if @ship && @ship.sunk?
+      return "\e[32mH\e[0m" if @ship
+      return "M"
+    else
       return "S" if show_ship && @ship
       return "."
     end

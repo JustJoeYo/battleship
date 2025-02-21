@@ -35,14 +35,16 @@ class Board
   
     consecutive_numbers = numbers.each_cons(2).all? { |a, b| b == a + 1 }
     consecutive_letters = letters.each_cons(2).all? { |a, b| b.ord == a.ord + 1 }
+
+    no_overlap = coordinates.all? { |coord| @cells[coord].empty? } # users could stack their ships without this
   
-    (same_letter && consecutive_numbers) || (same_number && consecutive_letters) # if this is true, then the ship is placed correctly
+    (same_letter && consecutive_numbers || same_number && consecutive_letters) && no_overlap # if this is true, then the ship is placed correctly
   end
 
   def place(ship, coordinates)
-    return unless valid_placement?(ship, coordinates) # gonna be using a lot of return unless statements
- 
-    coordinates.each do |coordinate| # for each coordinate, place the ship
+    return unless valid_placement?(ship, coordinates)
+
+    coordinates.each do |coordinate|
       @cells[coordinate].place_ship(ship)
     end
   end
@@ -55,7 +57,7 @@ class Board
         coordinate = "#{letter}#{number}"
         row += @cells[coordinate].render(show_ships) + " "
       end
-      board_string += row.strip + " \n" # i was wondering when id use "\n" to make a new line haha
+      board_string += row.strip + " \n"
     end
     board_string
   end

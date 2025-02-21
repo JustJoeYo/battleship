@@ -51,26 +51,31 @@ class Board
     end
   end
 
-  def render(show_ships = false) # will have to change spec file due to this.
-    rendered_board = "  " + (1..@width).to_a.join(" ") + "\n"
+  def render(show_ships = false) # I have no idea the best way to line it up... it is ever so slightly off
+    top_border = "  ┌" + "────" * @width + "┐\n" # added a border for style (;
+    bottom_border = "  └" + "────" * @width + "┘\n"
+    rendered_board = "    " + (1..@width).to_a.map { |n| " #{n} " }.join + "\n"
+    rendered_board += top_border
     @height.times do |row|
-      rendered_board += (65 + row).chr + " "
+      rendered_board += (65 + row).chr + " │"
       @width.times do |col|
         cell = @cells[(65 + row).chr + (col + 1).to_s]
         if cell.fired_upon?
           if cell.empty?
-            rendered_board += "\e[34mO\e[0m " # blue "O" for miss
+            rendered_board += " \e[34mO\e[0m │" # Blue "O" for miss
           else
-            rendered_board += "\e[31mX\e[0m " # red "X" for hit
+            rendered_board += " \e[31mX\e[0m │" # Red "X" for hit
           end
         elsif show_ships && !cell.empty?
-          rendered_board += "\e[32mS\e[0m " # green "S" for ship
+          rendered_board += " \e[32mS\e[0m │" # Green "S" for ship
         else
-          rendered_board += ". "
+          rendered_board += "   │"
         end
       end
       rendered_board += "\n"
+      rendered_board += "  ├" + "───┼" * (@width - 1) + "───┤\n" unless row == @height - 1
     end
+    rendered_board += bottom_border
     rendered_board
   end
 end

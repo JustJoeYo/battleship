@@ -1,4 +1,4 @@
-require './lib/ship'
+require 'spec_helper.rb'
 
 RSpec.configure do |config|
   config.formatter = :documentation

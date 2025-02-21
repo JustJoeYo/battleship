@@ -146,6 +146,7 @@ class Game
     end
   end
 
+  
   def generate_random_coordinates(length)
     letters = ("A"..(65 + @player.board.instance_variable_get(:@height) - 1).chr).to_a
     numbers = (1..@player.board.instance_variable_get(:@width)).to_a

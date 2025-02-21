@@ -15,8 +15,8 @@ class Player
     @ships
   end
 
-  def add_ship(name, length)
-    @ships << Ship.new(name, length)
+  def add_ship(name, length, coordinates = [])
+    @ships << Ship.new(name, length, coordinates)
   end
 
   def place_ships

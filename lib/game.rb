@@ -5,6 +5,7 @@ class Game
     @player = nil
     @computer = nil
     @last_hit = nil
+    @difficulty = 'easy'
   end
 
   def start
@@ -16,12 +17,33 @@ class Game
     puts "Enter \e[32mp\e[0m to play. Enter \e[31mq\e[0m to quit."
     input = gets.chomp.downcase
     if input == 'p'
+      choose_difficulty
       setup_game
     elsif input == 'q'
       puts "\e[31mGoodbye!\e[0m"
     else
       puts "\e[31mInvalid input. Please enter p or q.\e[0m"
       main_menu
+    end
+  end
+
+  def choose_difficulty
+    puts "Choose difficulty level:"
+    puts "1. Easy"
+    puts "2. Medium"
+    puts "3. Hard"
+    choice = gets.chomp.to_i
+
+    case choice
+    when 1
+      @difficulty = 'easy'
+    when 2
+      @difficulty = 'medium'
+    when 3
+      @difficulty = 'hard'
+    else
+      puts "\e[31mInvalid choice. Please enter a number between 1 and 3.\e[0m"
+      choose_difficulty
     end
   end
 
@@ -146,12 +168,11 @@ class Game
     end
   end
 
-  
   def generate_random_coordinates(length)
     letters = ("A"..(65 + @player.board.instance_variable_get(:@height) - 1).chr).to_a
     numbers = (1..@player.board.instance_variable_get(:@width)).to_a
     direction = ["horizontal", "vertical"].sample
-  
+
     coordinates = []
     if direction == "horizontal"
       start_letter = letters.sample
@@ -166,7 +187,7 @@ class Game
       start_number = numbers.sample
       start_letter.each do |let|
         coordinate = "#{let}#{start_number}"
-        break unless valid_coordinate?(coordinate) # similar to return unless, i enjoy using this for exception handling
+        break unless valid_coordinate?(coordinate)
         coordinates << coordinate
       end
     end
@@ -212,10 +233,28 @@ class Game
   end
 
   def intelligent_guess
-    if @last_hit
-      adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? } || random_guess
-    else
-      random_guess
+    if @difficulty == 'easy'
+      random_guess # just disables smart guessing based on hits
+    elsif @difficulty == 'medium'
+      if @last_hit # hits nearby guesses if computer guesses one and hits
+        adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? } || random_guess
+      else
+        random_guess
+      end
+    else # hard difficulty
+      if @last_hit
+        # Prioritize guessing in a straight line from the last hit
+        next_guess = adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? }
+        if next_guess
+          next_guess
+        else
+          # If no valid adjacent coordinates, reset to random guessing
+          @last_hit = nil 
+          random_guess # sanity check
+        end
+      else
+        random_guess
+      end
     end
   end
 

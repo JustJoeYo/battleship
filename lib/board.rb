@@ -51,16 +51,26 @@ class Board
     end
   end
 
-  def render(show_ships = false)
-    board_string = "  " + (1..@width).to_a.join(" ") + " \n"
-    ("A"..(65 + @height - 1).chr).each do |letter|
-      row = "#{letter} "
-      (1..@width).each do |number|
-        coordinate = "#{letter}#{number}"
-        row += @cells[coordinate].render(show_ships) + " "
+  def render(show_ships = false) # will have to change spec file due to this.
+    rendered_board = "  " + (1..@width).to_a.join(" ") + "\n"
+    @height.times do |row|
+      rendered_board += (65 + row).chr + " "
+      @width.times do |col|
+        cell = @cells[(65 + row).chr + (col + 1).to_s]
+        if cell.fired_upon?
+          if cell.empty?
+            rendered_board += "\e[34mO\e[0m " # blue "O" for miss
+          else
+            rendered_board += "\e[31mX\e[0m " # red "X" for hit
+          end
+        elsif show_ships && !cell.empty?
+          rendered_board += "\e[32mS\e[0m " # green "S" for ship
+        else
+          rendered_board += ". "
+        end
       end
-      board_string += row.strip + " \n"
+      rendered_board += "\n"
     end
-    board_string
+    rendered_board
   end
 end

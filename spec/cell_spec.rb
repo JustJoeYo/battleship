@@ -55,10 +55,10 @@ RSpec.describe Cell do
     expect(@cell.render(true)).to eq("S")
 
     @cell.fire_upon
-    expect(@cell.render).to eq("H")
+    expect(@cell.render).to eq("\e[32mH\e[0m")
 
     2.times { @cruiser.hit }
-    expect(@cell.render).to eq("X")
+    expect(@cell.render).to eq("\e[31mX\e[0m")
   end
 
   it 'knows when it has been fired upon and damages the ship' do
@@ -88,11 +88,11 @@ RSpec.describe Cell do
     expect(cell_2.render(true)).to eq("S") # show users own ship
 
     cell_2.fire_upon
-    expect(cell_2.render).to eq("H")
+    expect(cell_2.render).to eq("\e[32mH\e[0m")
 
     cruiser.hit
     cruiser.hit
     expect(cruiser.sunk?).to be true
-    expect(cell_2.render).to eq("X")
+    expect(cell_2.render).to eq("\e[31mX\e[0m")
   end
 end

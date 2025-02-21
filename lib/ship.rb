@@ -1,8 +1,9 @@
 class Ship
-  def initialize(name, length)
+  def initialize(name, length, coordinates = [])
     @name = name # these 3 could be in an attr_reader but alec said it aint 
     @length = length # great to put everything into an attr reader due to security reasons.
     @health = length # in this project I will avoid using attr_accessors/readers
+    @coordinates = []
   end
 
   def name
@@ -15,6 +16,10 @@ class Ship
 
   def health
     @health
+  end
+
+  def coordinates
+    @coordinates
   end
 
   def hit

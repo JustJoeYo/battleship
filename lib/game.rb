@@ -30,20 +30,23 @@ class Game
     puts "1. Small game (4x4 board with two 2x1 ships)"
     puts "2. Medium game (6x6 board with one 2x1 and two 3x1 ships)"
     puts "3. Large game (8x8 board with one 4x1, two 3x1, and one 2x1 ships)"
-    puts "4. Custom game"
+    puts "4. Extra Large game (10x10 board with one 4x1, two 3x1, and one 2x1 ships)"
+    puts "5. Custom game"
     choice = gets.chomp.to_i
 
     case choice
     when 1
-      setup_preset(4, 4, [["Ship1", 2], ["Ship2", 2]])
+      setup_preset(4, 4, [["Ship 1", 2], ["Ship 2", 2]])
     when 2
-      setup_preset(6, 6, [["Ship1", 2], ["Ship2", 3], ["Ship3", 3]])
+      setup_preset(6, 6, [["Ship 1", 2], ["Ship 2", 3], ["Ship 3", 3]])
     when 3
-      setup_preset(8, 8, [["Ship1", 4], ["Ship2", 3], ["Ship3", 3], ["Ship4", 2]])
+      setup_preset(8, 8, [["Ship 1", 4], ["Ship 2", 3], ["Ship 3", 3], ["Ship 4", 2]])
     when 4
+      setup_preset(10, 10, [["Ship 1", 4], ["Ship 2", 3], ["Ship 3", 3], ["Ship 4", 2]])
+    when 5
       setup_custom_game
     else
-      puts "\e[31mInvalid choice. Please enter a number between 1 and 4.\e[0m"
+      puts "\e[31mInvalid choice. Please enter a number between 1 and 5.\e[0m"
       setup_game
     end
   end

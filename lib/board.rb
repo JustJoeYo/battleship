@@ -40,7 +40,7 @@ class Board
 
     no_overlap = coordinates.all? { |coord| @cells[coord].empty? } # users could stack their ships without this
   
-    (same_letter && consecutive_numbers || same_number && consecutive_letters) && no_overlap # if this is true, then the ship is placed correctly
+    (same_letter && consecutive_numbers || same_number && consecutive_letters || ship.coordinates == coordinates) && no_overlap # if this is true, then the ship is placed correctly
   end
 
   def place(ship, coordinates)

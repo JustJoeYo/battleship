@@ -11,11 +11,28 @@ class Game
   end
 
   def start
+    intro_screen
     main_menu
   end
 
+  def intro_screen
+    system("clear")
+    type_out(@color.colorize("Welcome to #{@color.colorize("BATTLESHIP", :blue)}", :white)) # method on method moment
+    type_out(@color.colorize("Get ready to play!", :red))
+    sleep(1)
+    system("clear")
+  end
+ 
+  def type_out(text) # as much as id love to manually write out sleep methods, this is a little faster
+    text.each_char do |char|
+      print char
+      sleep(0.1)
+    end
+    puts
+  end
+
   def main_menu
-    puts @color.colorize("Welcome to BATTLESHIP", :blue)
+    puts @color.colorize("Welcome to #{@color.colorize("BATTLESHIP", :blue)}", :white)
     puts "Enter #{@color.colorize('p', :green)} to play. Enter #{@color.colorize('q', :red)} to quit."
     input = gets.chomp.downcase
     if input == 'p'

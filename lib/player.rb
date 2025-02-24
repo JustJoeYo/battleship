@@ -64,11 +64,34 @@ class Player
   def shot_result(board, coordinate)
     cell = board.cells[coordinate]
     if cell.empty?
-      @color.colorize("miss", :red)
+      puts @color.colorize("miss", :red)
     elsif cell.ship.sunk?
-      @color.colorize("hit and sunk the ship", :red)
+      sinking_ship
+      puts @color.colorize("hit and sunk the ship", :red)
     else
-      @color.colorize("hit", :green)
+      puts @color.colorize("hit", :green)
     end
+  end
+
+  def sinking_ship # ai was used here to create the sinking ship animation, chat gpt moment
+    system("clear")
+    frames = [
+      "A ship is sinking!\n\n    𓊝   \n     𓊝  \n      𓊝 \n       𓊝",
+      "A ship is sinking!\n\n     𓊝  \n      𓊝 \n       𓊝 \n        𓊝",
+      "A ship is sinking!\n\n      𓊝 \n       𓊝 \n        𓊝 \n         𓊝",
+      "A ship is sinking!\n\n       𓊝 \n        𓊝 \n         𓊝 \n          𓊝",
+      "A ship is sinking!\n\n        𓊝 \n         𓊝 \n          𓊝 \n           𓊝",
+      "A ship is sinking!\n\n         𓊝 \n          𓊝 \n           𓊝 \n            𓊝",
+      "A ship is sinking!\n\n          𓊝 \n           𓊝 \n            𓊝 \n             𓊝",
+      "A ship is sinking!\n\n           𓊝 \n            𓊝 \n             𓊝 \n              𓊝",
+      "A ship is sinking!\n\n            𓊝 \n             𓊝 \n              𓊝 \n               𓊝",
+      "A ship is sinking!\n\n             𓊝 \n              𓊝 \n               𓊝 \n                𓊝"
+    ]
+    frames.each do |frame|
+      system("clear")
+      puts @color.colorize(frame, :red)
+      sleep(0.1)
+    end
+    system("clear")
   end
 end

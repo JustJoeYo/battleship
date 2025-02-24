@@ -17,13 +17,13 @@ class Game
 
   def intro_screen
     system("clear")
-    type_out(@color.colorize("Welcome to #{@color.colorize("BATTLESHIP", :blue)}", :white)) # method on method moment
-    type_out(@color.colorize("Get ready to play!", :red))
+    type_out(@color.colorize("Welcome to #{@color.colorize("BATTLESHIP", :blue)}", :white))
+    type_out(@color.colorize("Good luck and have fun!", :red))
     sleep(1)
     system("clear")
   end
- 
-  def type_out(text) # as much as id love to manually write out sleep methods, this is a little faster
+
+  def type_out(text)
     text.each_char do |char|
       print char
       sleep(0.1)
@@ -223,7 +223,7 @@ class Game
 
   def take_turns
     until game_over?
-      system("clear") # Clear the terminal screen
+      system("clear")
       display_boards
       @player.take_shot(@computer.board)
       computer_shot unless game_over?
@@ -245,7 +245,7 @@ class Game
       if @player.board.valid_coordinate?(coordinate) && !@player.board.cells[coordinate].fired_upon?
         @player.board.cells[coordinate].fire_upon
         valid_shot = true
-        puts "My shot on #{@color.colorize(coordinate, :yellow)} was a #{shot_result(@player.board, coordinate)}."
+        puts "My shot on #{@color.colorize(coordinate, :yellow)} was a #{@player.shot_result(@player.board, coordinate)}."
         @last_hit = coordinate if @player.board.cells[coordinate].ship
       end
     end
@@ -253,34 +253,31 @@ class Game
 
   def intelligent_guess
     if @difficulty == 'easy'
-      random_guess # just disables smart guessing based on hits
+      random_guess
     elsif @difficulty == 'medium'
-      if @last_hit # hits nearby guesses if computer guesses one and hits
+      if @last_hit
         adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? } || random_guess
       else
         random_guess
       end
-    else # hard difficulty
+    else
       if @last_hit
-        # prioritize guessing in a straight line from the last hit
         next_guess = adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? }
         if next_guess
           next_guess
         else
-          # if no valid adjacent coordinates, reset to random guessing
           @last_hit = nil
           random_guess
         end
-      else # if no hits currently go back to a pattern based guess
-        # guess cells in a checkerboard pattern
+      else
         pattern_guess
       end
     end
   end
-  
+
   def pattern_guess
-    cells = @player.board.cells.keys.select.with_index { |_, i| i.even? } # guesses in evens/odds, just uses select method to filter out the odd indexes
-    cells.find { |coord| !@player.board.cells[coord].fired_upon? } || random_guess # this allows it to check off the board like a checkerboard
+    cells = @player.board.cells.keys.select.with_index { |_, i| i.even? }
+    cells.find { |coord| !@player.board.cells[coord].fired_upon? } || random_guess
   end
 
   def adjacent_coordinates(coordinate)
@@ -296,17 +293,6 @@ class Game
 
   def random_guess
     @player.board.cells.keys.sample
-  end
-
-  def shot_result(board, coordinate)
-    cell = board.cells[coordinate]
-    if cell.empty?
-      @color.colorize("miss", :red)
-    elsif cell.ship.sunk?
-      @color.colorize("hit and sunk the ship", :red)
-    else
-      @color.colorize("hit", :green)
-    end
   end
 
   def game_over?

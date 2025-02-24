@@ -16,24 +16,24 @@ class Game
 
   def main_menu
     puts @color.colorize("Welcome to BATTLESHIP", :blue)
-    puts "Enter \e[32mp\e[0m to play. Enter \e[31mq\e[0m to quit."
+    puts "Enter #{@color.colorize('p', :green)} to play. Enter #{@color.colorize('q', :red)} to quit."
     input = gets.chomp.downcase
     if input == 'p'
       choose_difficulty
       setup_game
     elsif input == 'q'
-      puts "\e[31mGoodbye!\e[0m"
+      puts @color.colorize("Goodbye!", :red)
     else
-      puts "\e[31mInvalid input. Please enter p or q.\e[0m"
+      puts @color.colorize("Invalid input. Please enter p or q.", :red)
       main_menu
     end
   end
 
   def choose_difficulty
     puts "Choose difficulty level:"
-    puts "1. Easy"
-    puts "2. Medium"
-    puts "3. Hard"
+    puts "1. #{@color.colorize("Easy", :green)}"
+    puts "2. #{@color.colorize("Medium", :yellow)}"
+    puts "3. #{@color.colorize("Hard", :red)}"
     choice = gets.chomp.to_i
 
     case choice
@@ -44,7 +44,7 @@ class Game
     when 3
       @difficulty = 'hard'
     else
-      puts "\e[31mInvalid choice. Please enter a number between 1 and 3.\e[0m"
+      puts @color.colorize("Invalid choice. Please enter a number between 1 and 3.", :red)
       choose_difficulty
     end
   end
@@ -70,7 +70,7 @@ class Game
     when 5
       setup_custom_game
     else
-      puts "\e[31mInvalid choice. Please enter a number between 1 and 5.\e[0m"
+      puts @color.colorize("Invalid choice. Please enter a number between 1 and 5.", :red)
       setup_game
     end
   end
@@ -138,7 +138,7 @@ class Game
         randomize_player_ships
         break
       else
-        puts "Invalid choice, please type 'm' for manual or 'r' for random placements."
+        puts @color.colorize("Invalid choice, please type 'm' for manual or 'r' for random placements.", :red)
       end
     end
     take_turns
@@ -215,9 +215,9 @@ class Game
   end
 
   def display_boards
-    puts "\e[34m=============COMPUTER BOARD=============\e[0m"
+    puts @color.colorize("=============COMPUTER BOARD=============", :blue)
     puts @computer.board.render
-    puts "\e[34m==============PLAYER BOARD==============\e[0m"
+    puts @color.colorize("==============PLAYER BOARD==============", :blue)
     puts @player.board.render(true)
   end
 
@@ -228,7 +228,7 @@ class Game
       if @player.board.valid_coordinate?(coordinate) && !@player.board.cells[coordinate].fired_upon?
         @player.board.cells[coordinate].fire_upon
         valid_shot = true
-        puts "My shot on \e[33m#{coordinate}\e[0m was a #{shot_result(@player.board, coordinate)}."
+        puts "My shot on #{@color.colorize(coordinate, :yellow)} was a #{shot_result(@player.board, coordinate)}."
         @last_hit = coordinate if @player.board.cells[coordinate].ship
       end
     end
@@ -262,7 +262,7 @@ class Game
   end
   
   def pattern_guess
-    cells = @player.board.cells.keys.select.with_index { |_, i| i.even? } # guesses in evens/odds
+    cells = @player.board.cells.keys.select.with_index { |_, i| i.even? } # guesses in evens/odds, just uses select method to filter out the odd indexes
     cells.find { |coord| !@player.board.cells[coord].fired_upon? } || random_guess # this allows it to check off the board like a checkerboard
   end
 
@@ -284,11 +284,11 @@ class Game
   def shot_result(board, coordinate)
     cell = board.cells[coordinate]
     if cell.empty?
-      "\e[31mmiss\e[0m"
+      @color.colorize("miss", :red)
     elsif cell.ship.sunk?
-      "\e[31mhit and sunk the ship\e[0m"
+      @color.colorize("hit and sunk the ship", :red)
     else
-      "\e[32mhit\e[0m"
+      @color.colorize("hit", :green)
     end
   end
 
@@ -302,9 +302,9 @@ class Game
 
   def end_game
     if all_sunk?(@computer.board)
-      puts "\e[32mYou won!\e[0m"
+      puts @color.colorize("You won!", :green)
     else
-      puts "\e[31mI won!\e[0m"
+      puts @color.colorize("I won!", :red)
     end
     main_menu
   end

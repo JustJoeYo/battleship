@@ -16,3 +16,6 @@ class Color
     "#{@colors[color]}#{text}#{@colors[:reset]}"
   end
 end
+
+# now although I just made this method I am not going to the other tests and adding it to them. this is primarily
+# because all this is doing is making my life slightly easier.

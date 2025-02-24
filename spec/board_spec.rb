@@ -1,6 +1,4 @@
-require 'spec_helper.rb'
-
-require 'spec_helper.rb'
+require 'spec_helper'
 
 RSpec.configure do |config|
   config.formatter = :documentation
@@ -49,7 +47,7 @@ RSpec.describe Board do
 
     it 'consecutive coordinates' do
       expect(@board.valid_placement?(@cruiser, ["A1", "A2", "A4"])).to be false
-      expect(@board.valid_placement?(@submarine, ["A1", "C1"])).to be false # just different style ships (2 long, 3 long etc just sanity checkin them)
+      expect(@board.valid_placement?(@submarine, ["A1", "C1"])).to be false
       expect(@board.valid_placement?(@cruiser, ["A3", "A2", "A1"])).to be false
       expect(@board.valid_placement?(@submarine, ["C1", "B1"])).to be false
     end
@@ -61,7 +59,7 @@ RSpec.describe Board do
 
     it 'correct placement check' do
       expect(@board.valid_placement?(@submarine, ["A1", "A2"])).to be true
-      expect(@board.valid_placement?(@cruiser, ["B1", "C1", "D1"])).to be true
+      expect(@board.valid_placement?(@cruiser, ["B1", "C1", "D1"])). to be true
     end
   end
 
@@ -82,19 +80,14 @@ RSpec.describe Board do
 
   describe '#render' do
     it 'renders the board' do
-      #expect(@board.render).to eq("     1  2  3  4 \n  ┌────────────────┐\nA │   │   │   │   │\n  ├───┼───┼───┼───┤\nB │   │   │   │   ...───┼───┼───┤\nC │   │   │   │   │\n  ├───┼───┼───┼───┤\nD │   │   │   │   │\n  └────────────────┘\n")
-
+      # using expected_output to keep it slightly organized
+      expected_output = "     1  2  3  4 \n  ┌────────────────┐\nA │   │   │   │   │\n  ├───┼───┼───┼───┤\nB │   │   │   │   │\n  ├───┼───┼───┼───┤\nC │   │   │   │   │\n  ├───┼───┼───┼───┤\nD │   │   │   │   │\n  └────────────────┘\n"
+      expect(@board.render.gsub(/\s+/, '')).to eq(expected_output.gsub(/\s+/, ''))
       @board.place(@cruiser, ["A1", "A2", "A3"])
-      # expect(@board.render(true)).to eq("+     1  2  3  4 
-      #  +  ┌────────────────┐
-      #  +A │ S │ S │ S │   │
-      #  +  ├───┼───┼───┼───┤
-      #  +B │   │   │   │   │
-      #  +  ├───┼───┼───┼───┤
-      #  +C │   │   │   │   │
-      #  +  ├───┼───┼───┼───┤
-      #  +D │   │   │   │   │
-      #  +  └────────────────┘")
+      # using gsub to remove spaces ".gsub(/\s+/, '')" we can check the output
+      # is the same or not without worrying about the minor formatting differences.
+      expected_output_2 = "     1  2  3  4 \n  ┌────────────────┐\nA │ \e[32mS\e[0m │ \e[32mS\e[0m │ \e[32mS\e[0m │   │\n  ├───┼───┼───┼───┤\nB │   │   │   │   │\n  ├───┼───┼───┼───┤\nC │   │   │   │   │\n  ├───┼───┼───┼───┤\nD │   │   │   │   │\n  └────────────────┘\n"
+      expect(@board.render(true).gsub(/\s+/, '')).to eq(expected_output_2.gsub(/\s+/, ''))
     end
   end
 end

@@ -1,4 +1,5 @@
 require './lib/player'
+require './lib/color'
 
 class Game
   def initialize
@@ -6,6 +7,7 @@ class Game
     @computer = nil
     @last_hit = nil
     @difficulty = 'easy'
+    @color = Color.new
   end
 
   def start
@@ -13,7 +15,7 @@ class Game
   end
 
   def main_menu
-    puts "\e[34mWelcome to BATTLESHIP\e[0m"
+    puts @color.colorize("Welcome to BATTLESHIP", :blue)
     puts "Enter \e[32mp\e[0m to play. Enter \e[31mq\e[0m to quit."
     input = gets.chomp.downcase
     if input == 'p'

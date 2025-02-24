@@ -1,4 +1,5 @@
-require 'spec_helper.rb'
+require './lib/cell'
+require './lib/ship'
 
 class Board
   def initialize(height = 4, width = 4)

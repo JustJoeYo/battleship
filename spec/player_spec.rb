@@ -44,7 +44,6 @@ RSpec.describe Player do
     opponent_board = Board.new(4, 4)
     opponent_board.place(Ship.new("Cruiser", 3), ["A1", "A2", "A3"])
     allow(@player).to receive(:gets).and_return("A1\n")
-    @player.take_shot(opponent_board)
-    expect { @player.shot_result(opponent_board, "A1") }.to output("\e[32mhit\e[0m\n").to_stdout
+    expect { @player.take_shot(opponent_board) }.to output(/Your shot on \e\[33mA1\e\[0m was a hit./).to_stdout
   end
 end

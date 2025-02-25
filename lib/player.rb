@@ -65,12 +65,12 @@ class Player
   def shot_result(board, coordinate)
     cell = board.cells[coordinate]
     if cell.empty?
-      puts @color.colorize("miss", :red)
+      "miss"
     elsif cell.ship.sunk?
       sinking_ship
-      puts @color.colorize("hit and sunk the ship", :red)
+      "hit and sunk the ship"
     else
-      puts @color.colorize("hit", :green)
+      "hit"
     end
   end
   

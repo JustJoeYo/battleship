@@ -38,9 +38,10 @@ class Board
     consecutive_numbers = numbers.each_cons(2).all? { |a, b| b == a + 1 }
     consecutive_letters = letters.each_cons(2).all? { |a, b| b.ord == a.ord + 1 }
 
-    no_overlap = coordinates.all? { |coord| @cells[coord].empty? } # users could stack their ships without this
-  
-    (same_letter && consecutive_numbers || same_number && consecutive_letters || ship.coordinates == coordinates) && no_overlap # if this is true, then the ship is placed correctly
+    within_bounds = coordinates.all? { |coord| valid_coordinate?(coord) } # dont break my game please
+    no_overlap = within_bounds && coordinates.all? { |coord| @cells[coord].empty? } # users could stack their ships without this
+
+    (same_letter && consecutive_numbers || same_number && consecutive_letters) && no_overlap && within_bounds # if this is true, then the ship is placed correctly
   end
 
   def place(ship, coordinates)

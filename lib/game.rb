@@ -1,5 +1,6 @@
 require './lib/player'
 require './lib/color'
+require './lib/shoot'
 
 class Game
   def initialize
@@ -8,6 +9,7 @@ class Game
     @last_hit = nil
     @difficulty = 'easy'
     @color = Color.new
+    @shot = Shoot.new
   end
 
   def start
@@ -17,13 +19,13 @@ class Game
 
   def intro_screen
     system("clear")
-    type_out(@color.colorize("Welcome to #{@color.colorize("BATTLESHIP", :blue)}", :white)) # method on method moment
-    type_out(@color.colorize("Get ready to play!", :red))
+    type_out(@color.colorize("Welcome to #{@color.colorize("BATTLESHIP", :blue)}", :white))
+    type_out(@color.colorize("Good luck and have fun!", :red))
     sleep(1)
     system("clear")
   end
- 
-  def type_out(text) # as much as id love to manually write out sleep methods, this is a little faster
+
+  def type_out(text)
     text.each_char do |char|
       print char
       sleep(0.1)
@@ -213,7 +215,7 @@ class Game
     coordinates
   end
 
-  def valid_coordinate?(coordinate)
+  def valid_coordinate?(coordinate) # super redundant, but I'm pressed for time and need it to work (refactor later)
     letters = ("A"..(65 + @player.board.instance_variable_get(:@height) - 1).chr).to_a
     numbers = (1..@player.board.instance_variable_get(:@width)).to_a
     letter = coordinate[0]
@@ -223,10 +225,11 @@ class Game
 
   def take_turns
     until game_over?
-      system("clear") # Clear the terminal screen
+      system("clear")
       display_boards
       @player.take_shot(@computer.board)
-      computer_shot unless game_over?
+      @shot.computer_shot(@computer, @player, @difficulty, @last_hit)
+      @last_hit = @shot.last_hit
     end
     end_game
   end
@@ -236,77 +239,6 @@ class Game
     puts @computer.board.render
     puts @color.colorize("==============PLAYER BOARD==============", :blue)
     puts @player.board.render(true)
-  end
-
-  def computer_shot
-    valid_shot = false
-    until valid_shot
-      coordinate = intelligent_guess
-      if @player.board.valid_coordinate?(coordinate) && !@player.board.cells[coordinate].fired_upon?
-        @player.board.cells[coordinate].fire_upon
-        valid_shot = true
-        puts "My shot on #{@color.colorize(coordinate, :yellow)} was a #{shot_result(@player.board, coordinate)}."
-        @last_hit = coordinate if @player.board.cells[coordinate].ship
-      end
-    end
-  end
-
-  def intelligent_guess
-    if @difficulty == 'easy'
-      random_guess # just disables smart guessing based on hits
-    elsif @difficulty == 'medium'
-      if @last_hit # hits nearby guesses if computer guesses one and hits
-        adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? } || random_guess
-      else
-        random_guess
-      end
-    else # hard difficulty
-      if @last_hit
-        # prioritize guessing in a straight line from the last hit
-        next_guess = adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? }
-        if next_guess
-          next_guess
-        else
-          # if no valid adjacent coordinates, reset to random guessing
-          @last_hit = nil
-          random_guess
-        end
-      else # if no hits currently go back to a pattern based guess
-        # guess cells in a checkerboard pattern
-        pattern_guess
-      end
-    end
-  end
-  
-  def pattern_guess
-    cells = @player.board.cells.keys.select.with_index { |_, i| i.even? } # guesses in evens/odds, just uses select method to filter out the odd indexes
-    cells.find { |coord| !@player.board.cells[coord].fired_upon? } || random_guess # this allows it to check off the board like a checkerboard
-  end
-
-  def adjacent_coordinates(coordinate)
-    letter = coordinate[0]
-    number = coordinate[1..-1].to_i
-    adjacent = []
-    adjacent << "#{(letter.ord - 1).chr}#{number}" if valid_coordinate?("#{(letter.ord - 1).chr}#{number}")
-    adjacent << "#{(letter.ord + 1).chr}#{number}" if valid_coordinate?("#{(letter.ord + 1).chr}#{number}")
-    adjacent << "#{letter}#{number - 1}" if valid_coordinate?("#{letter}#{number - 1}")
-    adjacent << "#{letter}#{number + 1}" if valid_coordinate?("#{letter}#{number + 1}")
-    adjacent
-  end
-
-  def random_guess
-    @player.board.cells.keys.sample
-  end
-
-  def shot_result(board, coordinate)
-    cell = board.cells[coordinate]
-    if cell.empty?
-      @color.colorize("miss", :red)
-    elsif cell.ship.sunk?
-      @color.colorize("hit and sunk the ship", :red)
-    else
-      @color.colorize("hit", :green)
-    end
   end
 
   def game_over?

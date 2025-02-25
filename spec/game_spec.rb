@@ -1,4 +1,4 @@
-require 'spec_helper.rb'
+require 'spec_helper'
 
 RSpec.describe Game do
   before(:each) do
@@ -8,10 +8,11 @@ RSpec.describe Game do
   describe '#initialize' do
     it 'initializes' do
       expect(@game).to be_instance_of(Game)
+      expect(@game.instance_variable_get(:@shot)).to be_instance_of(Shoot)
     end
 
     it 'has a player' do
-      expect(@game.instance_variable_get(:@player)).to be_nil # not using attr reader so this is the solution, gets the instance variable just the same
+      expect(@game.instance_variable_get(:@player)).to be_nil
     end
 
     it 'has a computer' do

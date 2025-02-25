@@ -1,5 +1,7 @@
 require 'spec_helper.rb'
 
+# over the board causes crash of program.
+
 RSpec.configure do |config|
   config.formatter = :documentation
 end
@@ -60,6 +62,11 @@ RSpec.describe Board do
     it 'correct placement check' do
       expect(@board.valid_placement?(@submarine, ["A1", "A2"])).to be true # => true
       expect(@board.valid_placement?(@cruiser, ["B1", "C1", "D1"])).to be true # => true
+    end
+
+    it 'on board' do
+      expect(@board.valid_placement?(@cruiser, ["A4", "A5", "A6"])).to be false
+      expect(@board.valid_placement?(@submarine, ["D4", "E4"])).to be false
     end
   end
 

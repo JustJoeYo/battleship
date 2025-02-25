@@ -45,7 +45,7 @@ class Player
       end
     end
   end
-
+  
   def take_shot(opponent_board)
     valid_shot = false
     until valid_shot
@@ -54,13 +54,14 @@ class Player
       if opponent_board.valid_coordinate?(coordinate) && !opponent_board.cells[coordinate].fired_upon?
         opponent_board.cells[coordinate].fire_upon
         valid_shot = true
-        puts "Your shot on #{@color.colorize(coordinate, :yellow)} was a #{shot_result(opponent_board, coordinate)}."
+        result = shot_result(opponent_board, coordinate)
+        puts "Your shot on #{@color.colorize(coordinate, :yellow)} was a #{result}."
       else
         puts @color.colorize("Please enter a valid coordinate:", :red)
       end
     end
   end
-
+  
   def shot_result(board, coordinate)
     cell = board.cells[coordinate]
     if cell.empty?
@@ -72,6 +73,7 @@ class Player
       puts @color.colorize("hit", :green)
     end
   end
+  
 
   def sinking_ship # ai was used here to create the sinking ship animation, chat gpt moment
     system("clear")

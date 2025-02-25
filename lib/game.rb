@@ -1,5 +1,6 @@
 require './lib/player'
 require './lib/color'
+require './lib/shoot'
 
 class Game
   def initialize
@@ -8,6 +9,7 @@ class Game
     @last_hit = nil
     @difficulty = 'easy'
     @color = Color.new
+    @shot = Shoot.new
   end
 
   def start
@@ -213,7 +215,7 @@ class Game
     coordinates
   end
 
-  def valid_coordinate?(coordinate)
+  def valid_coordinate?(coordinate) # super redundant, but I'm pressed for time and need it to work (refactor later)
     letters = ("A"..(65 + @player.board.instance_variable_get(:@height) - 1).chr).to_a
     numbers = (1..@player.board.instance_variable_get(:@width)).to_a
     letter = coordinate[0]
@@ -226,7 +228,8 @@ class Game
       system("clear")
       display_boards
       @player.take_shot(@computer.board)
-      computer_shot unless game_over?
+      @shot.computer_shot(@computer, @player, @difficulty, @last_hit)
+      @last_hit = @shot.last_hit
     end
     end_game
   end
@@ -236,63 +239,6 @@ class Game
     puts @computer.board.render
     puts @color.colorize("==============PLAYER BOARD==============", :blue)
     puts @player.board.render(true)
-  end
-
-  def computer_shot
-    valid_shot = false
-    until valid_shot
-      coordinate = intelligent_guess
-      if @player.board.valid_coordinate?(coordinate) && !@player.board.cells[coordinate].fired_upon?
-        @player.board.cells[coordinate].fire_upon
-        valid_shot = true
-        puts "My shot on #{@color.colorize(coordinate, :yellow)} was a #{@player.shot_result(@player.board, coordinate)}."
-        @last_hit = coordinate if @player.board.cells[coordinate].ship
-      end
-    end
-  end
-
-  def intelligent_guess
-    if @difficulty == 'easy'
-      random_guess
-    elsif @difficulty == 'medium'
-      if @last_hit
-        adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? } || random_guess
-      else
-        random_guess
-      end
-    else
-      if @last_hit
-        next_guess = adjacent_coordinates(@last_hit).find { |coord| @player.board.valid_coordinate?(coord) && !@player.board.cells[coord].fired_upon? }
-        if next_guess
-          next_guess
-        else
-          @last_hit = nil
-          random_guess
-        end
-      else
-        pattern_guess
-      end
-    end
-  end
-
-  def pattern_guess
-    cells = @player.board.cells.keys.select.with_index { |_, i| i.even? }
-    cells.find { |coord| !@player.board.cells[coord].fired_upon? } || random_guess
-  end
-
-  def adjacent_coordinates(coordinate)
-    letter = coordinate[0]
-    number = coordinate[1..-1].to_i
-    adjacent = []
-    adjacent << "#{(letter.ord - 1).chr}#{number}" if valid_coordinate?("#{(letter.ord - 1).chr}#{number}")
-    adjacent << "#{(letter.ord + 1).chr}#{number}" if valid_coordinate?("#{(letter.ord + 1).chr}#{number}")
-    adjacent << "#{letter}#{number - 1}" if valid_coordinate?("#{letter}#{number - 1}")
-    adjacent << "#{letter}#{number + 1}" if valid_coordinate?("#{letter}#{number + 1}")
-    adjacent
-  end
-
-  def random_guess
-    @player.board.cells.keys.sample
   end
 
   def game_over?

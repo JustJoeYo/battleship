@@ -1,5 +1,7 @@
 require 'spec_helper.rb'
 
+# over the board causes crash of program.
+
 RSpec.configure do |config|
   config.formatter = :documentation
 end
